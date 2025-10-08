@@ -1,48 +1,66 @@
-﻿// Models/Order.cs
+﻿using Azure;
+using Azure.Data.Tables;
 using System.ComponentModel.DataAnnotations;
 
 namespace ABC_retailers.Models
 {
-    public enum OrderStatus
+    public class Order : ITableEntity
     {
-        Submitted,
-        Processing,
-        Completed,
-        Cancelled
-    }
+        public string PartitionKey { get; set; } = "Order";
 
-    public class Order
-    {
+        public string RowKey { get; set; } = Guid.NewGuid().ToString();
+
+        public DateTimeOffset? Timestamp { get; set; }
+
+        public ETag ETag { get; set; }
+
         [Display(Name = "Order ID")]
-        public string Id { get; set; } = string.Empty; // set from Function response
 
-        [Required, Display(Name = "Customer")]
+        public string OrderId => RowKey;
+
+        [Required]
+        [Display(Name = "Customer")]
         public string CustomerId { get; set; } = string.Empty;
 
         [Display(Name = "Username")]
         public string Username { get; set; } = string.Empty;
 
-        [Required, Display(Name = "Product")]
+        [Required]
+        [Display(Name = "Product")]
         public string ProductId { get; set; } = string.Empty;
 
         [Display(Name = "Product Name")]
         public string ProductName { get; set; } = string.Empty;
 
-        // set by Function (server truth)
-        [Display(Name = "Order Placed (UTC)")]
-        public DateTimeOffset? OrderDateUtc { get; set; }
+        [Required]
+        [Display(Name = "Order Date")]
+        [DataType(DataType.Date)]
+        public DateTime OrderDate { get; set; } = DateTime.UtcNow.Date;
 
-        [Required, Range(1, int.MaxValue, ErrorMessage = "Quantity must be at least 1")]
+
+        [Required]
         [Display(Name = "Quantity")]
+        [Range(1, int.MaxValue, ErrorMessage = "Quantity must be at least 1")]
         public int Quantity { get; set; }
 
-        [Display(Name = "Unit Price"), DataType(DataType.Currency)]
+        [Display(Name = "Unit Price")]
+        [DataType(DataType.Currency)]
         public decimal UnitPrice { get; set; }
 
-        [Display(Name = "Total")]
-        public decimal TotalAmount => UnitPrice * Quantity;
+        [Display(Name = "Total Price")]
+        [DataType(DataType.Currency)]
+        public decimal TotalPrice { get; set; }
 
-        [Required, Display(Name = "Status")]
-        public OrderStatus Status { get; set; } = OrderStatus.Submitted;
+        [Required]
+        [Display(Name = "Status")]
+        public string Status { get; set; } = "Submitted";
+    }
+
+    public enum OrderStatus
+    {
+        Submitted,   // When order is first created 
+        Processing,  // When company opens/reviews the order
+        Completed,   // When order is delivered to customer 
+        Cancelled    // When order is cancelled
     }
 }

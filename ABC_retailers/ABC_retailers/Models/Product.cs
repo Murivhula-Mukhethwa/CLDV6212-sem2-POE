@@ -1,34 +1,61 @@
-﻿// Models/Product.cs
+﻿using Azure;
+using Azure.Data.Tables;
 using System.ComponentModel.DataAnnotations;
+
 
 namespace ABC_retailers.Models
 {
-    public class Product
+    public class Product : ITableEntity
     {
-        [Display(Name = "Product ID")]
-        public string Id { get; set; } = string.Empty; // set from Function response
 
-        [Required(ErrorMessage = "Product name is required")]
+        public string PartitionKey { get; set; } = "Product";
+
+        public string RowKey { get; set; } = Guid.NewGuid().ToString();
+
+        public DateTimeOffset? Timestamp { get; set; }
+
+        public ETag ETag { get; set; }
+
+        [Display(Name = "Product ID")]
+
+        public string ProductId => RowKey;
+
+        [Required]
         [Display(Name = "Product Name")]
+
         public string ProductName { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "Description is required")]
+        [Required]
         [Display(Name = "Description")]
+
         public string Description { get; set; } = string.Empty;
 
+        [Required(ErrorMessage = "Price is required")]
+        [Display(Name = "Price")]
 
+        public string PriceString { get; set; } = string.Empty;
 
-        // Models/Product.cs  (only the Range line shown)
-        [Required, Display(Name = "Price")]
-        [Range(typeof(decimal), "0.01", "79228162514264337593543950335",
-               ErrorMessage = "Price must be greater than 0")]
-        public decimal Price { get; set; }
+        [Display(Name = "Price")]
 
+        public decimal Price
+        {
+            get
+            {
+                return decimal.TryParse(PriceString, out var result) ? result : 0m;
+            }
+            set
+            {
+                PriceString = value.ToString("F2");
+            }
+        }
 
-        [Required, Display(Name = "Stock Available")]
+        [Required]
+        [Display(Name = "Stock Available")]
+
         public int StockAvailable { get; set; }
 
         [Display(Name = "Image URL")]
+
         public string ImageUrl { get; set; } = string.Empty;
     }
 }

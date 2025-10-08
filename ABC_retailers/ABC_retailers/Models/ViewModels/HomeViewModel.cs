@@ -1,4 +1,5 @@
-﻿namespace ABC_retailers.Models.ViewModel
+﻿
+namespace ABC_retailers.Models.ViewModel
 {
     public class HomeViewModel
     {
@@ -6,5 +7,7 @@
         public int CustomerCount { get; set; }
         public int ProductCount { get; set; }
         public int OrderCount { get; set; }
+
+        
     }
 }

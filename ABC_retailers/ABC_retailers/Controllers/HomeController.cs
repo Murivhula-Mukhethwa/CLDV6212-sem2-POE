@@ -1,61 +1,60 @@
 using System.Diagnostics;
 using ABC_retailers.Models;
 using ABC_retailers.Models.ViewModel;
-using ABC_retailers.Services;           // IFunctionsApi
+using ABC_retailers.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 
-namespace ABCRetailers.Controllers
+namespace ABC_retailers.Controllers;
+
+public class HomeController : Controller
 {
-    public class HomeController : Controller
+    private readonly IFunctionsApi _functionsApi;
+
+    public HomeController(IFunctionsApi functionsApi)
     {
-        private readonly IFunctionsApi _api;
-        private readonly ILogger<HomeController> _logger;
+        _functionsApi = functionsApi;
+    }
 
-        public HomeController(IFunctionsApi api, ILogger<HomeController> logger)
+    public async Task<IActionResult> Index()
+    {
+        var customers = await _functionsApi.GetCustomersAsync();
+        var products = await _functionsApi.GetProductsAsync();
+        var orders = await _functionsApi.GetOrdersAsync();
+
+        var viewModel = new HomeViewModel
         {
-            _api = api;
-            _logger = logger;
+            CustomerCount = customers.Count,
+            ProductCount = products.Count,
+            OrderCount = orders.Count
+        };
+
+        return View(viewModel);
+    }
+
+    public IActionResult Privacy() => View();
+
+    [HttpPost]
+    public async Task<IActionResult> InitializeStorage()
+    {
+        try
+        {
+            await _functionsApi.GetCustomersAsync(); // just call a method to initialize
+            TempData["Success"] = "Azure Functions / Storage initialized successfully!";
+        }
+        catch (Exception ex)
+        {
+            TempData["Error"] = $"Failed to initialize storage: {ex.Message}";
         }
 
-        public async Task<IActionResult> Index()
+        return RedirectToAction(nameof(Index));
+    }
+
+    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+    public IActionResult Error()
+    {
+        return View(new ErrorViewModel
         {
-            try
-            {
-                // Pull all three sets in parallel (simple + fine for small datasets)
-                var productsTask = _api.GetProductsAsync();
-                var customersTask = _api.GetCustomersAsync();
-                var ordersTask = _api.GetOrdersAsync();
-
-                await Task.WhenAll(productsTask, customersTask, ordersTask);
-
-                var products = productsTask.Result ?? new List<Product>();
-                var customers = customersTask.Result ?? new List<Customer>();
-                var orders = ordersTask.Result ?? new List<Order>();
-
-                var vm = new HomeViewModel
-                {
-                    FeaturedProducts = products.Take(8).ToList(),
-                    ProductCount = products.Count,
-                    CustomerCount = customers.Count,
-                    OrderCount = orders.Count
-                };
-
-                return View(vm);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Failed to load dashboard data from Functions API.");
-                TempData["Error"] = "Could not load dashboard data. Please try again.";
-                // Show an empty but valid model so the view renders
-                return View(new HomeViewModel());
-            }
-        }
-
-        public IActionResult Privacy() => View();
-
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-            => View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier
+        });
     }
 }

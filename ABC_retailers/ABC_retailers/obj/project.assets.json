@@ -2686,11 +2686,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\lab_services_student\\Desktop\\ABC_retailers\\ABC_retailers\\ABC_retailers.csproj",
+      "projectUniqueName": "C:\\Users\\lab_services_student\\Documents\\GitHub\\CLDV6212-sem2-POE\\ABC_retailers\\ABC_retailers\\ABC_retailers.csproj",
       "projectName": "ABC_retailers",
-      "projectPath": "C:\\Users\\lab_services_student\\Desktop\\ABC_retailers\\ABC_retailers\\ABC_retailers.csproj",
+      "projectPath": "C:\\Users\\lab_services_student\\Documents\\GitHub\\CLDV6212-sem2-POE\\ABC_retailers\\ABC_retailers\\ABC_retailers.csproj",
       "packagesPath": "C:\\Users\\lab_services_student\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\lab_services_student\\Desktop\\ABC_retailers\\ABC_retailers\\obj\\",
+      "outputPath": "C:\\Users\\lab_services_student\\Documents\\GitHub\\CLDV6212-sem2-POE\\ABC_retailers\\ABC_retailers\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
